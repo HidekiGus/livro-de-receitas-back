@@ -1,29 +1,38 @@
-//import client from '../database/database';
+import client from '../database/database';
 
 export async function createUser(
   name: string,
   email: string,
   password: string
 ) {
-  // await client.users.create({
-  //   data: {
-  //     name,
-  //     email,
-  //     password,
-  //   },
-  // });
+  // kept for future use
+  await client.connect();
+  try {
+    const db = client.db('livro-de-receitas');
+    await db.collection('users').insertOne({ name, email, password });
+  } finally {
+    await client.close();
+  }
 }
 
 export async function getUsers() {
-  // const result = await client.users.findMany();
-  // return result;
+  await client.connect();
+  try {
+    const db = client.db('livro-de-receitas');
+    const result = await db.collection('users').find().toArray();
+    return result;
+  } finally {
+    await client.close();
+  }
 }
 
 export async function findUserByEmail(email: string) {
-  // const result = await client.users.findUnique({
-  //   where: {
-  //     email,
-  //   },
-  // });
-  // return result;
+  await client.connect();
+  try {
+    const db = client.db('livro-de-receitas');
+    const result = await db.collection('users').findOne({ email });
+    return result;
+  } finally {
+    await client.close();
+  }
 }
