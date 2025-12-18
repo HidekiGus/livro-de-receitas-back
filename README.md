@@ -36,39 +36,39 @@ Abra o terminal no diretório em que você quer instalar o projeto, então execu
 ### ❤️ Rotas de Curtidas(Likes):
 
 ```
-POST /like/:recipeId - Registra a curtida em um post
+## POST /like/:recipeId - Registra a curtida em um post
 |-Recebe:
-|  \- header = authorization,
-|   \- params = recipeId
+|  |- header = authorization,
+|  |- params = recipeId
 |
 |-Envia:
-   \- Status 201: sua curtida foi registrada! 🥳
+   |- Status 201: sua curtida foi registrada! 🥳
 
-GET /likes - Retorna os posts curtidos do usuário
+## GET /likes - Retorna os posts curtidos do usuário
 |-Recebe:
-|  \- header = authorization
+|  |- header = authorization
 |
 |-Envia:
-   \- Status ✅200: vai lá, pega seus posts curtidos, vai
+   |- Status ✅200: "vai lá, pega seus posts curtidos, vai"
 ```
 
 ### Rotas de Usuários(User):
 
 ```
-POST /signup - Cria um novo usuário
+## POST /signup - Cria um novo usuário
 |-Recebe:
-|  \- newUserSchema (que é então validado)
-|      \- email
-|      \- senha (password)
+|  |- newUserSchema (preenchido, que é então validado)
+|      |- email
+|      |- senha (password)
 |
 |-Envia:
-   \- Token de autorização pessoal
+   |- Token de autorização pessoal
 
-POST /login
+## POST /login - (Tentativa de login)
 |-Recebe:
-|  \- userSchema (que é então validado)
-|      \- email
-|      \- senha (password)
+|  |- userSchema (que é então validado)
+|      |- email
+|      |- senha (password)
 
 
 GET /users - WIP
