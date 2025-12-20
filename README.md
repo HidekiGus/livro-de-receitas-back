@@ -42,7 +42,7 @@ Abra o terminal no diretório em que você quer instalar o projeto, então execu
 |  |- params = recipeId
 |
 |-Envia:
-   |- Status 201: sua curtida foi registrada! 🥳
+   |- Status ✅201: sua curtida foi registrada! 🥳
 
 ## GET /likes - Retorna os posts curtidos do usuário
 |-Recebe:
@@ -66,10 +66,11 @@ Abra o terminal no diretório em que você quer instalar o projeto, então execu
 
 ## POST /login - (Tentativa de login)
 |-Recebe:
-|  |- userSchema (que é então validado)
+|  |- body: userSchema (que é então validado)
 |      |- email
 |      |- senha (password)
-
+|-Envia:
+   |- Token de autorização pessoal
 
 GET /users - WIP
 ```
