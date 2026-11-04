@@ -1,14 +1,12 @@
 services:
   db_livro_de_receitas:
-    image: postgres
+    image: mongo:7
     container_name: db_livro_de_receitas
     restart: always
     ports:
-      - 2345:5432
-    env_file:
-      - .env
+      - 27017:27017
     volumes:
-      - pg_livro_de_receitas:/var/lib/postgresql/data
+      - mongo_livro_de_receitas:/data/db
 
   node_app_livro_de_receitas:
     container_name: livro_de_receitas
@@ -21,4 +19,4 @@ services:
       - .env
 
 volumes:
-  pg_livro_de_receitas:
+  mongo_livro_de_receitas:
