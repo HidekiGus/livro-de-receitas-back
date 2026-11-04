@@ -1,44 +1,47 @@
-import { client } from '../database/database';
+import { connectToDatabase, Like, Recipe } from '../database/database';
 import { getLikesByUserId } from './recipeRepository';
 
-/* export async function likeRecipe(userId: number, recipeId: number) {
-  const data = await getLikesByUserId(userId, recipeId);
-  if (data.length !== 0) {
-    await client.likes.delete({
-      where: {
-        id: data[0].id,
-      },
-    });
+export async function likeRecipe(
+  userId: string | number,
+  recipeId: string | number
+) {
+  await connectToDatabase();
+
+  const existingLikes = await getLikesByUserId(
+    String(userId),
+    String(recipeId)
+  );
+
+  if (existingLikes.length > 0) {
+    await Like.deleteOne({ _id: existingLikes[0]._id });
+    await Recipe.findByIdAndUpdate(recipeId, { $inc: { likes: -1 } });
     return false;
   } else {
-    await client.likes.create({
-      data: {
-        userId,
-        recipeId,
-      },
+    const newLike = new Like({
+      userId: String(userId),
+      recipeId: String(recipeId),
     });
+    await newLike.save();
+    await Recipe.findByIdAndUpdate(recipeId, { $inc: { likes: 1 } });
     return true;
   }
-} */
-
-export async function likeRecipe() {
-  console.log("likeRecipe pass");
-  return true;
 }
 
-/* export async function getLikedPosts(userId: number) {
-  const likes = await client.likes.findMany({ where: { userId } });
-  const likedPosts = [];
-  for (let i = 0; i < likes.length; i++) {
-    const recipeId = likes[i].recipeId;
-    const data = await client.recipes.findUnique({ where: { id: recipeId } });
-    likedPosts.push({ ...data, isLiked: true });
-  }
-  console.log(likedPosts);
-  return likedPosts;
-} */
+export async function getLikedPosts(userId: string | number) {
+  await connectToDatabase();
 
-export async function getLikedPosts() {
-  console.log("likedPosts pass");
-  return true;
+  const likes = await Like.find({ userId: String(userId) }).sort({
+    createdAt: -1,
+  });
+
+  const recipeIds = likes.map((like) => like.recipeId);
+  if (recipeIds.length === 0) {
+    return [];
+  }
+
+  const recipes = await Recipe.find({ _id: { $in: recipeIds } });
+  return recipes.map((recipe) => ({
+    ...recipe.toJSON(),
+    isLiked: true,
+  }));
 }

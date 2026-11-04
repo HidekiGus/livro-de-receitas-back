@@ -1,48 +1,25 @@
-import { connectToDatabase, Kitten, User } from '../database/database';
-import mongoose from 'mongoose';
-
-/* export async function createUser(
-  name: string,
-  email: string,
-  password: string
-) {
-  await client.users.create({
-    data: {
-      name,
-      email,
-      password,
-    },
-  });
-} */
+import { connectToDatabase, User } from '../database/database';
 
 export async function createUser(
   name: string,
   email: string,
-  password: string
+  password: string,
+  username = ''
 ) {
   await connectToDatabase();
 
-  const newUser = new User({ name, email, password });
+  const newUser = new User({ name, username, email, password });
   await newUser.save();
 
-  const savedUserId = newUser._id;
-  
-  mongoose.connection.close();
-  return true;
+  return String(newUser._id);
 }
 
 export async function getUsers() {
-  //const result = await client.users.findMany();
-  const result = "getUsers pass";
-  return result;
+  await connectToDatabase();
+  return await User.find({}, { password: 0 });
 }
 
 export async function findUserByEmail(email: string) {
-  /* const result = await client.users.findUnique({
-    where: {
-      email,
-    },
-  }); */
-  const result = "findUserByEmail pass";
-  return result;
+  await connectToDatabase();
+  return await User.findOne({ email });
 }

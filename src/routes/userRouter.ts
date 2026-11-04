@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { getUsers } from '../controllers/userController';
 import { validateSchema } from '../middlewares/validateSchema';
 import * as userController from '../controllers/userController';
 import { newUserSchema } from '../schemas/newUserSchema';
@@ -14,7 +13,6 @@ userRouter.post(
 );
 userRouter.post('/login', validateSchema(userSchema), userController.login);
 userRouter.get('/', userController.getStatusCheck);
-//#TODO:
-userRouter.get('/users', getUsers);
+userRouter.get('/users', userController.getUsers);
 
 export default userRouter;

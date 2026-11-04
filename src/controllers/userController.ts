@@ -1,18 +1,21 @@
 import { Request, Response } from 'express';
 import * as userService from '../services/userService';
-//#TODO:
-import * as userRepository from '../repositories/userRepository';
-import { resolveJWT } from '../utils/jwtResolver';
 
 export async function createUser(req: Request, res: Response) {
-  const { name, email, password, confirmPassword } = req.body;
-  await userService.createUser(name, email, password, confirmPassword);
+  const { name, email, password, confirmPassword, username } = req.body;
+  await userService.createUser(
+    name,
+    email,
+    password,
+    confirmPassword,
+    username
+  );
   res.sendStatus(201);
 }
 
-export async function getUsers(req: Request, res: Response) {
-  const data = await userRepository.getUsers();
-  res.status(203).send(data);
+export async function getUsers(_req: Request, res: Response) {
+  const data = await userService.getUsers();
+  res.status(200).send(data);
 }
 
 export async function login(req: Request, res: Response) {
@@ -21,6 +24,6 @@ export async function login(req: Request, res: Response) {
   res.status(200).send(token);
 }
 
-export async function getStatusCheck(req: Request, res: Response) {
+export async function getStatusCheck(_req: Request, res: Response) {
   res.status(200).send('Welcome to the livro-de-receitas API!');
 }

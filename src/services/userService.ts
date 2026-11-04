@@ -2,77 +2,54 @@ import * as userRepository from '../repositories/userRepository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-/* export async function createUser(
-  name: string,
-  email: string,
-  password: string,
-  confirmPassword: string
-) {
-  if (password !== confirmPassword) {
-    throw { type: 'badRequest', message: 'Senhas não conferem!' };
-  }
-
-  const userData = await userRepository.findUserByEmail(email);
-
-  if (userData !== null) {
-    throw { type: 'alreadyUsed', message: 'Esse email já está em uso!' };
-  }
-
-  const encryptedPassword = bcrypt.hashSync(password, 10);
-
-  await userRepository.createUser(name, email, encryptedPassword);
-} */
+const SALT_ROUNDS = 10;
 
 export async function createUser(
   name: string,
   email: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
+  username = ''
 ) {
   if (password !== confirmPassword) {
     throw { type: 'badRequest', message: 'Senhas não conferem!' };
   }
 
-  //const userData = await userRepository.findUserByEmail(email);
-
-  /* if (userData !== null) {
+  const existingUser = await userRepository.findUserByEmail(email);
+  if (existingUser) {
     throw { type: 'alreadyUsed', message: 'Esse email já está em uso!' };
-  } */
-  const encryptedPassword = bcrypt.hashSync(password, 10);
-  await userRepository.createUser(name, email, encryptedPassword);
-}
-
-/* export async function login(email: string, password: string) {
-  const userData = await userRepository.findUserByEmail(email);
-
-  if (userData === null) {
-    throw {
-      type: 'notFound',
-      message: 'Check email and password and try again!',
-    };
-  } else if (bcrypt.compareSync(password, userData.password)) {
-    return await generateJWT(email);
-  } else {
-    throw {
-      type: 'unauthorized',
-      message: 'Check your email and password and try again!',
-    };
   }
-} */
+
+  const encryptedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  await userRepository.createUser(name, email, encryptedPassword, username);
+}
 
 export async function login(email: string, password: string) {
-  console.log(login, password);
-  return true;
+  const userData = await userRepository.findUserByEmail(email);
+
+  if (!userData) {
+    throw {
+      type: 'unauthorized',
+      message: 'Confira seu email e senha e tente novamente!',
+    };
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, userData.password);
+  if (!isPasswordValid) {
+    throw {
+      type: 'unauthorized',
+      message: 'Confira seu email e senha e tente novamente!',
+    };
+  }
+
+  return generateJWT(String(userData._id));
 }
 
-/* export async function generateJWT(email: string) {
-  const { id: userId } = await userRepository.findUserByEmail(email);
-  const secretKey = process.env.JWT_SECRET;
-  const token = jwt.sign({ userId }, secretKey);
-  return token;
-} */
+export function generateJWT(userId: string) {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  return jwt.sign({ userId }, secretKey, { expiresIn: '7d' });
+}
 
-export async function generateJWT() {
-  console.log("generate JWT pass");
-  return true;
+export async function getUsers() {
+  return await userRepository.getUsers();
 }

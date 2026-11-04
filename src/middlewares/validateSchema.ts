@@ -6,8 +6,10 @@ export function validateSchema(schema: ObjectSchema) {
     const validation = schema.validate(req.body);
 
     if (validation.error) {
+      console.log(validation.error);
       return res.status(422).send(validation.error.message);
     }
+
 
     next();
   };

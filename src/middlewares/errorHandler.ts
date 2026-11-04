@@ -1,18 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
 
+const ERROR_STATUS_MAP: Record<string, number> = {
+  badRequest: 400,
+  unauthorized: 401,
+  notFound: 404,
+  alreadyUsed: 409,
+  alreadyExists: 409,
+  conflict: 409,
+  unprocessableEntity: 422,
+};
+
 export default function errorHandler(
   error: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
-  console.log(error.message);
-  if (error.type === 'unauthorized') {
-    return res.status(401).send(error.message);
-  } else if (error.type === 'alreadyUsed') {
-    return res.status(409).send(error.message);
-  } else if (error.type === 'badRequest') {
-    return res.status(400).send(error.message);
-  }
-  res.status(500).send(error.message);
+  const statusCode = error?.type ? ERROR_STATUS_MAP[error.type] || 500 : 500;
+  const message = error?.message || 'Erro interno do servidor.';
+
+  return res.status(statusCode).send(message);
 }

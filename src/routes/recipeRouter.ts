@@ -7,6 +7,7 @@ const recipeRouter = Router();
 
 recipeRouter.post(
   '/recipes',
+  validateSchema(newRecipeSchema),
   recipeController.createRecipe
 );
 recipeRouter.get('/recipes', recipeController.getAllRecipes);
