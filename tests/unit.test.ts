@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
+import sharp from 'sharp';
 import * as likeService from '../src/services/likeService';
 import * as likeRepository from '../src/repositories/likeRepository';
 import * as jwtResolver from '../src/utils/jwtResolver';
+import { cropRecipeImageToLandscape } from '../src/services/imageService';
 
 describe('Tests the like services and JWT verification', () => {
   it('Tests the likeRecipe function', async () => {
@@ -33,5 +35,25 @@ describe('Tests the like services and JWT verification', () => {
       type: 'unauthorized',
       message: 'Token de autenticação inválido ou expirado!',
     });
+  });
+
+  it('Smart-crops and converts an image to 720x480 landscape WebP', async () => {
+    const sampleInputBuffer = await sharp({
+      create: {
+        width: 1000,
+        height: 1200,
+        channels: 3,
+        background: { r: 220, g: 120, b: 40 },
+      },
+    })
+      .png()
+      .toBuffer();
+
+    const processedBuffer = await cropRecipeImageToLandscape(sampleInputBuffer);
+    const metadata = await sharp(processedBuffer).metadata();
+
+    expect(metadata.format).toBe('webp');
+    expect(metadata.width).toBe(720);
+    expect(metadata.height).toBe(480);
   });
 });

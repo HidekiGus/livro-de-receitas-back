@@ -4,7 +4,7 @@ import * as recipeService from '../services/recipeService';
 export async function createRecipe(req: Request, res: Response) {
   const {
     title,
-    image,
+    // image,
     portions,
     time,
     ingredients,
@@ -14,10 +14,12 @@ export async function createRecipe(req: Request, res: Response) {
   } = req.body;
   const { authorization } = req.headers;
   const authenticatedUserId = res.locals.userId || userId;
+  const imageBuffer = req.file?.buffer;
 
   await recipeService.createRecipe(
     title,
-    image,
+    // image,
+    imageBuffer,
     ingredients,
     method,
     portions,

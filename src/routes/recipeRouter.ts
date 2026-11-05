@@ -2,11 +2,13 @@ import { Router } from 'express';
 import * as recipeController from '../controllers/recipeController';
 import { validateSchema } from '../middlewares/validateSchema';
 import { newRecipeSchema } from '../schemas/newRecipeSchema';
+import { uploadRecipeImage } from '../middlewares/uploadMiddleware';
 
 const recipeRouter = Router();
 
 recipeRouter.post(
   '/recipes',
+  uploadRecipeImage.single('image'),
   validateSchema(newRecipeSchema),
   recipeController.createRecipe
 );

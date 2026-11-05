@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export const newRecipeSchema = Joi.object({
   title: Joi.string().required(),
-  image: Joi.string().uri().required(),
+  // image: Joi.string().uri().required(),
   ingredients: Joi.alternatives()
     .try(Joi.string(), Joi.array().items(Joi.string()))
     .required(),

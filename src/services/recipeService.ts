@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import * as recipeRepository from '../repositories/recipeRepository';
 import { resolveJWT, resolveOptionalJWT } from '../utils/jwtResolver';
+import { processAndUploadRecipeImage } from './imageService';
 
 function parseLines(input: string | string[]): string[] {
   if (Array.isArray(input)) {
@@ -14,7 +15,8 @@ function parseLines(input: string | string[]): string[] {
 
 export async function createRecipe(
   title: string,
-  image: string,
+  // image: string,
+  imageBuffer: Buffer | undefined,
   ingredients: string | string[],
   method: string | string[],
   portions: number,
@@ -26,12 +28,34 @@ export async function createRecipe(
   const resolvedUserId =
     userId || (await resolveJWT(authorization));
 
+  if (!imageBuffer) {
+    throw {
+      type: 'unprocessableEntity',
+      message: 'O arquivo de imagem da receita é obrigatório!',
+    };
+  }
+
+  const existingRecipe = await recipeRepository.findRecipeByUserIdAndTitle(
+    resolvedUserId,
+    title
+  );
+  if (existingRecipe) {
+    throw {
+      type: 'alreadyExists',
+      message:
+        'Já existe uma receita com esse título criada por este usuário. Altere o título e tente novamente!',
+    };
+  }
+
+  const imageUrl = await processAndUploadRecipeImage(imageBuffer);
+
   const ingredientList = parseLines(ingredients);
   const methodList = parseLines(method);
 
   const newRecipeId = await recipeRepository.createRecipe(
     title,
-    image,
+    // image,
+    imageUrl,
     ingredientList,
     methodList,
     Number(portions),
